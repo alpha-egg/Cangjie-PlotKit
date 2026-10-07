@@ -215,6 +215,23 @@ func testScatterWithTrendAddsDashedLine(): Unit {
     @Expect(s.indexOf("stroke-dasharray") != None)
 }
 
+@Test
+func testReadmeLibraryExampleWorksEndToEnd(): Unit {
+    let t = readCsv("data/sales.csv")
+    let g = groupAgg(t.strColumn("month"), t.numColumn("amount"), "sum")
+
+    let opts = ChartOptions()
+    opts.title = "月度销售额"
+    opts.yLabel = "万元"
+    opts.theme = darkTheme()
+    opts.showValues = true
+
+    let frame = barChart(g.keys, g.values, opts)
+    let svg = frame.render()
+    @Expect(svg.indexOf("月度销售额") != None)
+    @Expect(svg.indexOf("<rect") != None)
+}
+
 // ---------- 工具 ----------
 
 func countOf(s: String, sub: String): Int64 {
