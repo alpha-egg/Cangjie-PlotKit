@@ -56,7 +56,12 @@ func runChart(cmd: String, fl: Flags, pos: Array<String>): Int64 {
         return 1
     }
 
-    let t = readCsv(path)
+    let maybeT = tryReadCsv(path)
+    if (maybeT.isNone()) {
+        println("error: cannot read CSV file '${path}'")
+        return 1
+    }
+    let t = maybeT.getOrThrow()
     if (!t.hasColumn(xName)) {
         println("error: column not found: ${xName}")
         return 1
@@ -103,6 +108,18 @@ func runChart(cmd: String, fl: Flags, pos: Array<String>): Int64 {
     }
 
     return emit(frame, fl, cmd, "${prep.categories.size} categories, ${prep.series.size} series")
+}
+
+/** 读 CSV; 文件不存在或内容无法解码时返回 None, 由调用方给出提示 */
+func tryReadCsv(path: String): Option<Table> {
+    if (!exists(path)) {
+        return None
+    }
+    try {
+        return Some(readCsv(path))
+    } catch (e: Exception) {
+        return None
+    }
 }
 
 /** 把 (x, y) 两列整理成分类轴数据; gcol 为空时不分组 */
