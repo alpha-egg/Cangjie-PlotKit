@@ -1,0 +1,13 @@
+[package]
+  cjc-version = "1.0.5"
+  name = "plotkit"
+  description = "纯仓颉实现的轻量数据可视化库与命令行工具: CSV -> SVG 图表"
+  version = "0.1.0"
+  target-dir = ""
+  output-type = "executable"
+  compile-option = ""
+  override-compile-option = ""
+  link-option = ""
+  package-configuration = {}
+
+[dependencies]
