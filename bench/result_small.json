@@ -1,0 +1,108 @@
+[
+  {
+    "rows": 100000,
+    "csv_mb": 2.3,
+    "mode": "table",
+    "heap": "default",
+    "ok": true,
+    "sec": 0.534,
+    "peak_mb": 153.6,
+    "throughput_mb_s": 4.3,
+    "result": "mode=table rows=100000 groups=12 agg=sum total=504394297.8"
+  },
+  {
+    "rows": 100000,
+    "csv_mb": 2.3,
+    "mode": "stream",
+    "heap": "default",
+    "ok": true,
+    "sec": 0.307,
+    "peak_mb": 83.2,
+    "throughput_mb_s": 7.4,
+    "result": "mode=stream rows=100000 groups=12 agg=sum total=504394297.8"
+  },
+  {
+    "rows": 200000,
+    "csv_mb": 4.6,
+    "mode": "table",
+    "heap": "default",
+    "ok": true,
+    "sec": 0.948,
+    "peak_mb": 243.8,
+    "throughput_mb_s": 4.8,
+    "result": "mode=table rows=200000 groups=12 agg=sum total=1008899673.4"
+  },
+  {
+    "rows": 200000,
+    "csv_mb": 4.6,
+    "mode": "stream",
+    "heap": "default",
+    "ok": true,
+    "sec": 0.55,
+    "peak_mb": 94.6,
+    "throughput_mb_s": 8.3,
+    "result": "mode=stream rows=200000 groups=12 agg=sum total=1008899673.4"
+  },
+  {
+    "rows": 300000,
+    "csv_mb": 6.8,
+    "mode": "table",
+    "heap": "default",
+    "ok": true,
+    "sec": 1.857,
+    "peak_mb": 271.8,
+    "throughput_mb_s": 3.7,
+    "result": "mode=table rows=300000 groups=12 agg=sum total=1513234472.199999"
+  },
+  {
+    "rows": 300000,
+    "csv_mb": 6.8,
+    "mode": "stream",
+    "heap": "default",
+    "ok": true,
+    "sec": 0.818,
+    "peak_mb": 93.1,
+    "throughput_mb_s": 8.4,
+    "result": "mode=stream rows=300000 groups=12 agg=sum total=1513234472.199999"
+  },
+  {
+    "rows": 400000,
+    "csv_mb": 9.1,
+    "mode": "table",
+    "heap": "default",
+    "ok": false,
+    "peak_mb_at_failure": 272.8,
+    "error": "    Out of memory"
+  },
+  {
+    "rows": 400000,
+    "csv_mb": 9.1,
+    "mode": "stream",
+    "heap": "default",
+    "ok": true,
+    "sec": 1.161,
+    "peak_mb": 86.5,
+    "throughput_mb_s": 7.9,
+    "result": "mode=stream rows=400000 groups=12 agg=sum total=2016358562.8"
+  },
+  {
+    "rows": 500000,
+    "csv_mb": 11.4,
+    "mode": "table",
+    "heap": "default",
+    "ok": false,
+    "peak_mb_at_failure": 280.3,
+    "error": "    Out of memory"
+  },
+  {
+    "rows": 500000,
+    "csv_mb": 11.4,
+    "mode": "stream",
+    "heap": "default",
+    "ok": true,
+    "sec": 1.5,
+    "peak_mb": 83.7,
+    "throughput_mb_s": 7.6,
+    "result": "mode=stream rows=500000 groups=12 agg=sum total=2521426796.4"
+  }
+]

@@ -1,0 +1,134 @@
+[
+  {
+    "rows": 500000,
+    "csv_mb": 11.4,
+    "mode": "table",
+    "heap": "8gb",
+    "ok": true,
+    "sec": 1.333,
+    "peak_mb": 533.3,
+    "throughput_mb_s": 8.6,
+    "result": "mode=table rows=500000 groups=12 agg=sum total=2521426796.4"
+  },
+  {
+    "rows": 500000,
+    "csv_mb": 11.4,
+    "mode": "stream",
+    "heap": "8gb",
+    "ok": true,
+    "sec": 0.818,
+    "peak_mb": 146.5,
+    "throughput_mb_s": 13.9,
+    "result": "mode=stream rows=500000 groups=12 agg=sum total=2521426796.4"
+  },
+  {
+    "rows": 1000000,
+    "csv_mb": 22.8,
+    "mode": "table",
+    "heap": "8gb",
+    "ok": true,
+    "sec": 3.88,
+    "peak_mb": 786.1,
+    "throughput_mb_s": 5.9,
+    "result": "mode=table rows=1000000 groups=12 agg=sum total=5043269685.599981"
+  },
+  {
+    "rows": 1000000,
+    "csv_mb": 22.8,
+    "mode": "stream",
+    "heap": "8gb",
+    "ok": true,
+    "sec": 1.623,
+    "peak_mb": 147.8,
+    "throughput_mb_s": 14.0,
+    "result": "mode=stream rows=1000000 groups=12 agg=sum total=5043269685.599981"
+  },
+  {
+    "rows": 2000000,
+    "csv_mb": 45.6,
+    "mode": "table",
+    "heap": "8gb",
+    "ok": true,
+    "sec": 7.838,
+    "peak_mb": 1197.2,
+    "throughput_mb_s": 5.8,
+    "result": "mode=table rows=2000000 groups=12 agg=sum total=10090837505.800013"
+  },
+  {
+    "rows": 2000000,
+    "csv_mb": 45.6,
+    "mode": "stream",
+    "heap": "8gb",
+    "ok": true,
+    "sec": 2.772,
+    "peak_mb": 156.7,
+    "throughput_mb_s": 16.5,
+    "result": "mode=stream rows=2000000 groups=12 agg=sum total=10090837505.800013"
+  },
+  {
+    "rows": 3000000,
+    "csv_mb": 68.4,
+    "mode": "table",
+    "heap": "8gb",
+    "ok": true,
+    "sec": 12.924,
+    "peak_mb": 1785.9,
+    "throughput_mb_s": 5.3,
+    "result": "mode=table rows=3000000 groups=12 agg=sum total=15141023205.999971"
+  },
+  {
+    "rows": 3000000,
+    "csv_mb": 68.4,
+    "mode": "stream",
+    "heap": "8gb",
+    "ok": true,
+    "sec": 4.156,
+    "peak_mb": 158.6,
+    "throughput_mb_s": 16.5,
+    "result": "mode=stream rows=3000000 groups=12 agg=sum total=15141023205.999971"
+  },
+  {
+    "rows": 4000000,
+    "csv_mb": 91.2,
+    "mode": "table",
+    "heap": "8gb",
+    "ok": true,
+    "sec": 17.256,
+    "peak_mb": 2403.5,
+    "throughput_mb_s": 5.3,
+    "result": "mode=table rows=4000000 groups=12 agg=sum total=20192349490.199856"
+  },
+  {
+    "rows": 4000000,
+    "csv_mb": 91.2,
+    "mode": "stream",
+    "heap": "8gb",
+    "ok": true,
+    "sec": 5.43,
+    "peak_mb": 159.5,
+    "throughput_mb_s": 16.8,
+    "result": "mode=stream rows=4000000 groups=12 agg=sum total=20192349490.199856"
+  },
+  {
+    "rows": 5000000,
+    "csv_mb": 114.0,
+    "mode": "table",
+    "heap": "8gb",
+    "ok": true,
+    "sec": 23.755,
+    "peak_mb": 3080.9,
+    "throughput_mb_s": 4.8,
+    "result": "mode=table rows=5000000 groups=12 agg=sum total=25244699863.799747"
+  },
+  {
+    "rows": 5000000,
+    "csv_mb": 114.0,
+    "mode": "stream",
+    "heap": "8gb",
+    "ok": true,
+    "sec": 6.797,
+    "peak_mb": 160.3,
+    "throughput_mb_s": 16.8,
+    "result": "mode=stream rows=5000000 groups=12 agg=sum total=25244699863.799747"
+  }
+]

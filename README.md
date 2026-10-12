@@ -27,8 +27,13 @@ cjpm build -o plotkit
 plotkit bar     <csv> --x <列> --y <列> [--group <列>] [--agg ...] [--sort ...]
 plotkit line    <csv> --x <列> --y <列> [--series <列>] [--agg ...] [--sort ...]
 plotkit scatter <csv> --x <列> --y <列> [--group <列>] [--trend]
+plotkit gen     <out.csv> --rows <行数>
+plotkit bench   <csv> --x <列> --y <列> [--agg ...] [--stream]
 plotkit version
 ```
+
+`gen` 与 `bench` 是基准测试的辅助命令：前者合成指定行数的测试数据，后者在同一份数据上
+跑一遍聚合并把结果打印出来，供 `bench/run_bench.py` 在进程外计时和测内存。
 
 三个命令共用的选项：
 
@@ -47,6 +52,8 @@ plotkit version
 - `--agg mean|sum|count|min|max`：同一分类下的聚合方式，默认 `mean`。
 - `--sort asc|desc`：按各序列合计值重排分类。
 - `--no-from-zero`：y 轴不从 0 开始。
+- `--stream`：单趟流式聚合，只保留分组累加器，不把整表读进内存。数据量大时用这个。
+  它只覆盖「按一列分组、对一列聚合」，因此不能和 `--group` 一起用。
 
 `scatter` 专有：
 
@@ -84,7 +91,7 @@ $BIN bar data/sales.csv --x region --y amount --agg sum --theme dark -o out/dark
 
 - `plotkit.core`：数值格式化、线性比例尺、nice-number 刻度、最小二乘拟合
 - `plotkit.svg`：XML 转义与 SVG 文档构建器
-- `plotkit.data`：CSV 解析、列式表、分组聚合、二维透视
+- `plotkit.data`：CSV 解析、列式表、分组聚合、二维透视、流式聚合
 - `plotkit.chart`：主题、图表配置、绘图框架、柱状图/折线图/散点图
 - `plotkit.cli`：命令行参数解析
 
@@ -118,18 +125,20 @@ main(): Int64 {
 
 常用的入口：
 
-| 函数 | 作用 |
-| --- | --- |
-| `readCsv(path)` / `parseCsv(text)` | 读取或解析 CSV，返回 `Table` |
-| `Table.strColumn(name)` / `.numColumn(name)` | 取字符串列或数值列 |
-| `groupAgg(keys, values, how)` | 分组聚合，返回 `Grouped` |
-| `pivot(xCol, seriesCol, values, how)` | 二维透视，返回 `Pivot` |
-| `linearFit(xs, ys)` | 最小二乘拟合，返回 `[slope, intercept, r2]` |
-| `niceTicks(lo, hi, target)` | 生成美观刻度 |
-| `barChart` / `barChartGrouped` | 柱状图 |
-| `lineChart` / `lineChartMulti` | 折线图 |
-| `scatterChart` / `scatterChartMulti` | 散点图 |
-| `PlotFrame.doc` | 底层 `SvgDoc`，可以继续手动添加图元 |
+| 函数                                           | 作用                                 |
+| -------------------------------------------- | ---------------------------------- |
+| `readCsv(path)` / `parseCsv(text)`           | 读取或解析 CSV，返回 `Table`               |
+| `Table.strColumn(name)` / `.numColumn(name)` | 取字符串列或数值列                          |
+| `groupAgg(keys, values, how)`                | 分组聚合，返回 `Grouped`                  |
+| `streamAgg(path, keyCol, valCol, how)`       | 流式分组聚合，不构造 `Table`，返回 `Grouped`      |
+| `streamAggStat(...)`                         | 同上，另带回扫描到的行数与字节数                    |
+| `pivot(xCol, seriesCol, values, how)`        | 二维透视，返回 `Pivot`                    |
+| `linearFit(xs, ys)`                          | 最小二乘拟合，返回 `[slope, intercept, r2]` |
+| `niceTicks(lo, hi, target)`                  | 生成美观刻度                             |
+| `barChart` / `barChartGrouped`               | 柱状图                                |
+| `lineChart` / `lineChartMulti`               | 折线图                                |
+| `scatterChart` / `scatterChartMulti`         | 散点图                                |
+| `PlotFrame.doc`                              | 底层 `SvgDoc`，可以继续手动添加图元             |
 
 ## 输入格式
 
@@ -155,14 +164,14 @@ month,region,amount,orders
 
 `examples/` 下的 SVG 全部由本工具生成，直接用浏览器打开即可。
 
-| 文件 | 对应命令 |
-| --- | --- |
-| `bar_grouped.svg` | 分组柱状图，3 个区域 × 6 个月 |
-| `bar_sorted_dark.svg` | 深色主题，降序排序，标注数值 |
-| `bar_students.svg` | 班级平均分 |
-| `line_multi.svg` | 多序列折线图 |
-| `line_single.svg` | 单序列折线图 |
-| `scatter_trend.svg` | 散点图与最小二乘趋势线 |
+| 文件                    | 对应命令               |
+| --------------------- | ------------------ |
+| `bar_grouped.svg`     | 分组柱状图，3 个区域 × 6 个月 |
+| `bar_sorted_dark.svg` | 深色主题，降序排序，标注数值     |
+| `bar_students.svg`    | 班级平均分              |
+| `line_multi.svg`      | 多序列折线图             |
+| `line_single.svg`     | 单序列折线图             |
+| `scatter_trend.svg`   | 散点图与最小二乘趋势线        |
 
 ## 目录结构
 
@@ -171,8 +180,12 @@ cangjie-plotkit/
 ├── cjpm.toml
 ├── data/                      演示数据集
 ├── examples/                  示例图表
+├── bench/                     大规模 CSV 基准
+│   ├── run_bench.py           进程外计时与测内存
+│   └── result_*.json          实测结果
 └── src/
     ├── main.cj                命令行入口
+    ├── bench.cj               数据生成与基准辅助命令
     ├── plotkit_test.cj        单元测试
     ├── cli/args.cj
     ├── core/num.cj            数值格式化
@@ -181,6 +194,7 @@ cangjie-plotkit/
     ├── svg/builder.cj         SVG 文档构建器
     ├── data/csv.cj            CSV 解析
     ├── data/table.cj          表格、聚合、透视
+    ├── data/stream.cj         流式 CSV 聚合
     ├── chart/config.cj        主题与配置
     ├── chart/frame.cj         绘图区框架
     ├── chart/bar.cj
@@ -194,16 +208,34 @@ cangjie-plotkit/
 cjpm test
 ```
 
-24 条用例，覆盖：
+29 条用例，覆盖：
 
 - 数值格式化与标签取值
 - 比例尺映射，刻度的覆盖性与等距性
 - CSV 解析：引号字段、字段内逗号、双引号转义、BOM、CRLF、空行
 - 分组聚合的五种聚合函数与分类顺序，透视时缺失组合补 0
+- 流式聚合与整表加载在五种聚合方式下结果一致，含引号字段、跨 64 KB 块边界的字段、
+  未知列报错、行数与空行统计
 - 最小二乘拟合，含精确直线和退化输入
 - 多字节文本的 XML 转义
 - 三类图表的端到端渲染断言
 - README 中那段库用法示例本身
+
+## 基准测试
+
+`bench/` 下是整表加载与流式聚合的对比脚本。测量都在进程外做：墙钟取子进程的起止时间，
+内存轮询操作系统的 `PeakWorkingSetSize`，每条配置跑三次取中位数。被测程序里不插桩，
+测出来的就是它自己的开销。堆上限通过子进程的环境变量 `cjHeapSize` 调整。
+
+```bash
+cjpm build -o plotkit
+python -I bench/run_bench.py --heap 8gb        # 50 万到 500 万行逐档爬坡
+python -I bench/run_bench.py --phase small     # 默认堆上限下的内存不足边界
+python -I bench/run_bench.py --phase sweep     # 固定 500 万行, 堆上限从 32MB 扫到 8GB
+```
+
+测试数据由 `plotkit gen` 现生成，不进仓库。结果写在 `bench/result_*.json`，
+其中 `result_ramp_8gb.json` 每一档两条路径的 `total` 字段完全一致，这是正确性的对照。
 
 ## 实现说明
 
@@ -225,7 +257,8 @@ UTF-8 字符拆坏，运行期抛 `Invalid utf8 byte sequence`。
 
 - y 轴必须是数值列，x 轴可以是分类或数值。
 - 图例固定在绘图区右上角，与 matplotlib 的默认行为一致；最右侧数据很高时可能轻微遮挡。
-- 整个 CSV 一次性读入内存，没有做流式解析。
+- 默认路径会把整个 CSV 读进内存再建表；`--stream` 只覆盖单键分组聚合，散点图、
+  交叉分组和多趟变换仍然走整表加载。
 - 只支持分组柱状图，没有堆叠柱状图、面积图、直方图、箱线图和多子图。
 - 只在 `x86_64-w64-mingw32` 目标上验证过。
 

@@ -1,6 +1,7 @@
 package plotkit
 
 import std.collection.*
+import std.fs.*
 import std.unittest.*
 import std.unittest.testmacro.*
 import plotkit.chart.*
@@ -232,7 +233,120 @@ func testReadmeLibraryExampleWorksEndToEnd(): Unit {
     @Expect(svg.indexOf("<rect") != None)
 }
 
+// ---------- 流式聚合 ----------
+
+@Test
+func testStreamAggMatchesTablePath(): Unit {
+    let t = readCsv("data/sales.csv")
+    let xv = t.strColumn("month")
+    let yv = t.numColumn("amount")
+    let modes = ["sum", "mean", "count", "min", "max"]
+    for (how in modes) {
+        let a = groupAgg(xv, yv, how)
+        let b = streamAgg("data/sales.csv", "month", "amount", how)
+        @Expect(a.len() == b.len())
+        var i = 0
+        while (i < a.len()) {
+            @Expect(a.keys[i] == b.keys[i])
+            @Expect(abs(a.values[i] - b.values[i]) < 1e-9)
+            i = i + 1
+        }
+    }
+}
+
+@Test
+func testStreamAggReportsRowsAndBytes(): Unit {
+    let p = writeTempCsv("stream_rows.csv", "k,v\na,1\nb,2\n\nc,3\n")
+    let st = streamAggStat(p, "k", "v", "count")
+    // 空行不计入
+    @Expect(st.rows == 3)
+    @Expect(st.bytes == 17)
+    @Expect(st.grouped.len() == 3)
+    removeQuietly(p)
+}
+
+@Test
+func testStreamAggFollowsRfc4180Quoting(): Unit {
+    // 引号内的逗号与换行都不能当作分隔符, 也要能处理 BOM 与 CRLF
+    let text = "\u{FEFF}k,v,n\r\na,1,x\r\n\"b,1\",2,y\r\n\"multi\nline\",3,z\r\n"
+    let p = writeTempCsv("stream_quotes.csv", text)
+    let g = streamAgg(p, "k", "v", "sum")
+    @Expect(g.len() == 3)
+    @Expect(g.keys[0] == "a")
+    @Expect(g.keys[1] == "b,1")
+    @Expect(g.keys[2] == "multi\nline")
+    @Expect(abs(g.values[0] - 1.0) < 1e-9)
+    @Expect(abs(g.values[1] - 2.0) < 1e-9)
+    @Expect(abs(g.values[2] - 3.0) < 1e-9)
+    removeQuietly(p)
+}
+
+@Test
+func testStreamAggRejectsUnknownColumn(): Unit {
+    let p = writeTempCsv("stream_badcol.csv", "k,v\na,1\n")
+    var threw = false
+    try {
+        streamAgg(p, "nope", "v", "sum")
+    } catch (e: Exception) {
+        threw = true
+    }
+    @Expect(threw)
+    removeQuietly(p)
+}
+
+@Test
+func testStreamAggSpansChunkBoundary(): Unit {
+    // 64 KB 一块, 把块边界正好落在引号字段内部, 检验跨块状态是否保持
+    let p = tempPath("stream_big.csv")
+    removeQuietly(p)
+    let f = File.create(p)
+    f.write("k,v\n".toArray())            //  4
+    f.write("\"".toArray())               //  5, 引号字段从 k 列开始
+    let blk = Array<UInt8>(1024, repeat: b'x')
+    var i = 0
+    while (i < 60) {                      // 61440, 共 61445
+        f.write(blk)
+        i = i + 1
+    }
+    f.write(Array<UInt8>(4096, repeat: b'y'))   // 65541, 块边界 65536 落在引号内
+    f.write("\",7\n".toArray())
+    f.close()
+
+    let st = streamAggStat(p, "k", "v", "sum")
+    @Expect(st.rows == 1)
+    @Expect(st.grouped.len() == 1)
+    @Expect(st.grouped.keys[0].size == 65536)
+    @Expect(abs(st.grouped.values[0] - 7.0) < 1e-9)
+    removeQuietly(p)
+}
+
 // ---------- 工具 ----------
+
+func tempPath(name: String): String {
+    try {
+        Directory.create("tmp", recursive: true)
+    } catch (e: Exception) {
+        // 目录已存在
+    }
+    return "tmp/${name}"
+}
+
+func writeTempCsv(name: String, text: String): String {
+    let p = tempPath(name)
+    removeQuietly(p)
+    let f = File.create(p)
+    f.write(text.toArray())
+    f.close()
+    return p
+}
+
+func removeQuietly(path: String): Unit {
+    try {
+        remove(path)
+    } catch (e: Exception) {
+        // 文件不存在时忽略
+    }
+}
 
 func countOf(s: String, sub: String): Int64 {
     var n = 0

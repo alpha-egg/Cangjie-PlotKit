@@ -1,0 +1,124 @@
+[
+  {
+    "rows": 5000000,
+    "csv_mb": 114.0,
+    "mode": "table",
+    "heap": "32mb",
+    "ok": false,
+    "peak_mb_at_failure": 8.6,
+    "error": "    Out of memory"
+  },
+  {
+    "rows": 5000000,
+    "csv_mb": 114.0,
+    "mode": "stream",
+    "heap": "32mb",
+    "ok": true,
+    "sec": 13.622,
+    "peak_mb": 41.6,
+    "throughput_mb_s": 8.4,
+    "result": "mode=stream rows=5000000 groups=12 agg=sum total=25244699863.799747"
+  },
+  {
+    "rows": 5000000,
+    "csv_mb": 114.0,
+    "mode": "table",
+    "heap": "64mb",
+    "ok": false,
+    "peak_mb_at_failure": 8.5,
+    "error": "    Out of memory"
+  },
+  {
+    "rows": 5000000,
+    "csv_mb": 114.0,
+    "mode": "stream",
+    "heap": "64mb",
+    "ok": true,
+    "sec": 10.575,
+    "peak_mb": 74.2,
+    "throughput_mb_s": 10.8,
+    "result": "mode=stream rows=5000000 groups=12 agg=sum total=25244699863.799747"
+  },
+  {
+    "rows": 5000000,
+    "csv_mb": 114.0,
+    "mode": "table",
+    "heap": "128mb",
+    "ok": false,
+    "peak_mb_at_failure": 125.3,
+    "error": "    Out of memory"
+  },
+  {
+    "rows": 5000000,
+    "csv_mb": 114.0,
+    "mode": "stream",
+    "heap": "128mb",
+    "ok": true,
+    "sec": 8.111,
+    "peak_mb": 139.6,
+    "throughput_mb_s": 14.1,
+    "result": "mode=stream rows=5000000 groups=12 agg=sum total=25244699863.799747"
+  },
+  {
+    "rows": 5000000,
+    "csv_mb": 114.0,
+    "mode": "table",
+    "heap": "256mb",
+    "ok": false,
+    "peak_mb_at_failure": 274.2,
+    "error": "    Out of memory"
+  },
+  {
+    "rows": 5000000,
+    "csv_mb": 114.0,
+    "mode": "stream",
+    "heap": "256mb",
+    "ok": true,
+    "sec": 7.691,
+    "peak_mb": 150.1,
+    "throughput_mb_s": 14.8,
+    "result": "mode=stream rows=5000000 groups=12 agg=sum total=25244699863.799747"
+  },
+  {
+    "rows": 5000000,
+    "csv_mb": 114.0,
+    "mode": "table",
+    "heap": "1gb",
+    "ok": false,
+    "peak_mb_at_failure": 1102.2,
+    "error": "    Out of memory"
+  },
+  {
+    "rows": 5000000,
+    "csv_mb": 114.0,
+    "mode": "stream",
+    "heap": "1gb",
+    "ok": true,
+    "sec": 7.405,
+    "peak_mb": 152.1,
+    "throughput_mb_s": 15.4,
+    "result": "mode=stream rows=5000000 groups=12 agg=sum total=25244699863.799747"
+  },
+  {
+    "rows": 5000000,
+    "csv_mb": 114.0,
+    "mode": "table",
+    "heap": "8gb",
+    "ok": true,
+    "sec": 23.46,
+    "peak_mb": 3042.6,
+    "throughput_mb_s": 4.9,
+    "result": "mode=table rows=5000000 groups=12 agg=sum total=25244699863.799747"
+  },
+  {
+    "rows": 5000000,
+    "csv_mb": 114.0,
+    "mode": "stream",
+    "heap": "8gb",
+    "ok": true,
+    "sec": 6.893,
+    "peak_mb": 158.3,
+    "throughput_mb_s": 16.5,
+    "result": "mode=stream rows=5000000 groups=12 agg=sum total=25244699863.799747"
+  }
+]

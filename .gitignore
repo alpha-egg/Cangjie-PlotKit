@@ -13,6 +13,11 @@ out/
 tmp/
 *.log
 
+# 基准测试生成的数据文件 (体积大, 由 bench 命令现生成)
+bench/gen_*.csv
+__pycache__/
+*.pyc
+
 # 编辑器 / 系统
 .idea/
 .vscode/

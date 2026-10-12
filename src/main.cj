@@ -37,6 +37,12 @@ main(args: Array<String>): Int64 {
     if (cmd == "bar" || cmd == "line" || cmd == "scatter") {
         return runChart(cmd, fl, pos)
     }
+    if (cmd == "gen") {
+        return runGen(pos, fl)
+    }
+    if (cmd == "bench") {
+        return runBench(pos, fl)
+    }
     println("error: unknown command '${cmd}'")
     printUsage()
     return 1
@@ -83,6 +89,10 @@ func runChart(cmd: String, fl: Flags, pos: Array<String>): Int64 {
         return 1
     }
 
+    if (fl.flag("stream")) {
+        return runStreamChart(cmd, fl, opts, path, xName, yName, how)
+    }
+
     // --series 是 --group 的别名
     var gcol = fl.get("group", "")
     if (gcol.size == 0) {
@@ -108,6 +118,59 @@ func runChart(cmd: String, fl: Flags, pos: Array<String>): Int64 {
     }
 
     return emit(frame, fl, cmd, "${prep.categories.size} categories, ${prep.series.size} series")
+}
+
+/**
+ * 流式出一张图: 单趟扫完 CSV, 只保留分组累加器, 不构造 Table.
+ *
+ * 只覆盖"按一列分组 + 对一列聚合"这一种用法; 交叉分组与散点图需要反复取列,
+ * 仍走整表加载. 两条路径的分组顺序与数值结果一致, 因此输出可以逐字节比对.
+ */
+func runStreamChart(
+    cmd: String, fl: Flags, opts: ChartOptions, path: String,
+    xName: String, yName: String, how: String
+): Int64 {
+    if (cmd == "scatter") {
+        println("error: --stream 只用于分组聚合, 散点图请去掉 --stream")
+        return 1
+    }
+    var gcol = fl.get("group", "")
+    if (gcol.size == 0) {
+        gcol = fl.get("series", "")
+    }
+    if (gcol.size > 0) {
+        println("error: --stream 不支持 --group, 交叉分组请去掉 --stream")
+        return 1
+    }
+    if (!exists(path)) {
+        println("error: cannot read CSV file '${path}'")
+        return 1
+    }
+
+    var st: StreamStat
+    try {
+        st = streamAggStat(path, xName, yName, how)
+    } catch (e: Exception) {
+        println("error: ${e.message}")
+        return 1
+    }
+
+    let one = ArrayList<Series>()
+    one.add(Series("", st.grouped.values))
+    var prep = Prepared(st.grouped.keys, one.toArray())
+
+    let order = fl.get("sort", "none")
+    if (order == "asc" || order == "desc") {
+        prep = reorder(prep, order)
+    }
+
+    var frame: PlotFrame
+    if (cmd == "bar") {
+        frame = barChartGrouped(prep.categories, prep.series, opts)
+    } else {
+        frame = lineChartMulti(prep.categories, prep.series, opts)
+    }
+    return emit(frame, fl, cmd, "${st.rows} rows streamed, ${prep.categories.size} categories")
 }
 
 /** 读 CSV; 文件不存在或内容无法解码时返回 None, 由调用方给出提示 */
@@ -335,8 +398,11 @@ func printUsage(): Unit {
     println("  plotkit line    <data.csv> --x <列> --y <列> [--series <列>] [--agg ...] [--sort asc|desc]")
     println("  plotkit scatter <data.csv> --x <列> --y <列> [--group <列>] [--trend]")
     println("  plotkit version")
+    println("  plotkit gen     <out.csv> --rows <行数>           (生成规模化测试数据)")
+    println("  plotkit bench   <data.csv> --x <列> --y <列> [--agg ...] [--stream]")
     println("")
     println("通用选项:")
+    println("      --stream          单趟流式聚合, 不把整表读进内存 (仅分组聚合)")
     println("  -o, --out <文件>      输出 SVG 路径 (默认 <命令>.svg)")
     println("      --title <文字>    图表标题")
     println("      --xlabel <文字>   x 轴标题")

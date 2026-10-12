@@ -1,0 +1,122 @@
+[
+  {
+    "rows": 500000,
+    "csv_mb": 11.40049934387207,
+    "mode": "table",
+    "heap": "default",
+    "ok": false,
+    "peak_mb_at_failure": 278.9,
+    "error": "    Out of memory"
+  },
+  {
+    "rows": 500000,
+    "csv_mb": 11.40049934387207,
+    "mode": "stream",
+    "heap": "default",
+    "ok": true,
+    "sec": 0.735,
+    "peak_mb": 156.6,
+    "throughput_mb_s": 15.5,
+    "result": "mode=stream rows=500000 groups=12 agg=sum total=2521426796.4"
+  },
+  {
+    "rows": 1000000,
+    "csv_mb": 22.800811767578125,
+    "mode": "table",
+    "heap": "default",
+    "ok": false,
+    "peak_mb_at_failure": 277.3,
+    "error": "    Out of memory"
+  },
+  {
+    "rows": 1000000,
+    "csv_mb": 22.800811767578125,
+    "mode": "stream",
+    "heap": "default",
+    "ok": true,
+    "sec": 1.423,
+    "peak_mb": 157.9,
+    "throughput_mb_s": 16.0,
+    "result": "mode=stream rows=1000000 groups=12 agg=sum total=5043269685.599981"
+  },
+  {
+    "rows": 2000000,
+    "csv_mb": 45.60211181640625,
+    "mode": "table",
+    "heap": "default",
+    "ok": false,
+    "peak_mb_at_failure": 278.3,
+    "error": "    Out of memory"
+  },
+  {
+    "rows": 2000000,
+    "csv_mb": 45.60211181640625,
+    "mode": "stream",
+    "heap": "default",
+    "ok": true,
+    "sec": 2.741,
+    "peak_mb": 158.9,
+    "throughput_mb_s": 16.6,
+    "result": "mode=stream rows=2000000 groups=12 agg=sum total=10090837505.800013"
+  },
+  {
+    "rows": 3000000,
+    "csv_mb": 68.40444755554199,
+    "mode": "table",
+    "heap": "default",
+    "ok": false,
+    "peak_mb_at_failure": 277.7,
+    "error": "    Out of memory"
+  },
+  {
+    "rows": 3000000,
+    "csv_mb": 68.40444755554199,
+    "mode": "stream",
+    "heap": "default",
+    "ok": true,
+    "sec": 4.063,
+    "peak_mb": 160.1,
+    "throughput_mb_s": 16.8,
+    "result": "mode=stream rows=3000000 groups=12 agg=sum total=15141023205.999971"
+  },
+  {
+    "rows": 4000000,
+    "csv_mb": 91.20513820648193,
+    "mode": "table",
+    "heap": "default",
+    "ok": false,
+    "peak_mb_at_failure": 271.1,
+    "error": "    Out of memory"
+  },
+  {
+    "rows": 4000000,
+    "csv_mb": 91.20513820648193,
+    "mode": "stream",
+    "heap": "default",
+    "ok": true,
+    "sec": 5.46,
+    "peak_mb": 159.5,
+    "throughput_mb_s": 16.7,
+    "result": "mode=stream rows=4000000 groups=12 agg=sum total=20192349490.199856"
+  },
+  {
+    "rows": 5000000,
+    "csv_mb": 114.00730419158936,
+    "mode": "table",
+    "heap": "default",
+    "ok": false,
+    "peak_mb_at_failure": 274.2,
+    "error": "    Out of memory"
+  },
+  {
+    "rows": 5000000,
+    "csv_mb": 114.00730419158936,
+    "mode": "stream",
+    "heap": "default",
+    "ok": true,
+    "sec": 6.728,
+    "peak_mb": 160.5,
+    "throughput_mb_s": 16.9,
+    "result": "mode=stream rows=5000000 groups=12 agg=sum total=25244699863.799747"
+  }
+]
