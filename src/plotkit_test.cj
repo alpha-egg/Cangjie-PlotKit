@@ -320,6 +320,51 @@ func testStreamAggSpansChunkBoundary(): Unit {
     removeQuietly(p)
 }
 
+@Test
+func testStreamAggPreservesEscapedQuoteAcrossChunks(): Unit {
+    // 表头和左引号占 5 字节，转义双引号分别在第一块末尾和第二块开头。
+    let prefix = String.fromUtf8(Array<UInt8>(64 * 1024 - 6, repeat: b'x'))
+    let text = "k,v\n\"${prefix}\"\"z\",7\n${prefix}z,3\n"
+    let p = writeTempCsv("stream_split_quote.csv", text)
+    let g = streamAgg(p, "k", "v", "sum")
+
+    @Expect(g.len() == 2)
+    @Expect(g.keys[0] == "${prefix}\"z")
+    @Expect(g.values[0] == 7.0)
+    @Expect(g.keys[1] == "${prefix}z")
+    @Expect(g.values[1] == 3.0)
+    removeQuietly(p)
+}
+
+@Test
+func testStreamAggUsesSameColumnAsKeyAndValue(): Unit {
+    let inputs = ["amount,note\n1,a\n2,b\n2,c\n", "amount\n1\n2\n2"]
+    for (text in inputs) {
+        let p = writeTempCsv("stream_same_column.csv", text)
+        let g = streamAgg(p, "amount", "amount", "sum")
+
+        @Expect(g.len() == 2)
+        @Expect(g.keys[0] == "1")
+        @Expect(g.values[0] == 1.0)
+        @Expect(g.keys[1] == "2")
+        @Expect(g.values[1] == 4.0)
+        removeQuietly(p)
+    }
+}
+
+@Test
+func testStreamAggSkipsBlankLinesBeforeHeader(): Unit {
+    let p = writeTempCsv("stream_blank_header.csv", "\n\r\nk,v\r\na,1\r\nb,2")
+    let g = streamAgg(p, "k", "v", "sum")
+
+    @Expect(g.len() == 2)
+    @Expect(g.keys[0] == "a")
+    @Expect(g.values[0] == 1.0)
+    @Expect(g.keys[1] == "b")
+    @Expect(g.values[1] == 2.0)
+    removeQuietly(p)
+}
+
 // ---------- 工具 ----------
 
 func tempPath(name: String): String {
