@@ -50,6 +50,7 @@ public func streamAggStat(path: String, keyCol: String, valCol: String, how: Str
 
     var field = ArrayList<UInt8>()
     var inQuotes = false
+    var quoteAtChunkEnd = false
     var col = 0
     var keyVal = ""
     var valVal = ""
@@ -64,11 +65,24 @@ public func streamAggStat(path: String, keyCol: String, valCol: String, how: Str
         while (n > 0) {
             total = total + n
             var i = 0
+            // 上一块末尾的引号可能是转义双引号的第一个。
+            if (quoteAtChunkEnd) {
+                quoteAtChunkEnd = false
+                if (buf[0] == b'"') {
+                    field.add(b'"')
+                    i = 1
+                } else {
+                    inQuotes = false
+                }
+            }
             while (i < n) {
                 let c = buf[i]
                 if (inQuotes) {
                     if (c == b'"') {
-                        if (i + 1 < n && buf[i + 1] == b'"') {
+                        if (i + 1 == n) {
+                            quoteAtChunkEnd = true
+                            i = i + 1
+                        } else if (buf[i + 1] == b'"') {
                             field.add(b'"')
                             i = i + 2
                         } else {
@@ -92,6 +106,9 @@ public func streamAggStat(path: String, keyCol: String, valCol: String, how: Str
                         hdrCells.add(stripBom(String.fromUtf8(field.toArray())).trimAscii())
                     } else if (col == keyIdx) {
                         keyVal = String.fromUtf8(field.toArray())
+                        if (keyIdx == valIdx) {
+                            valVal = keyVal
+                        }
                     } else if (col == valIdx) {
                         valVal = String.fromUtf8(field.toArray())
                     }
@@ -108,6 +125,9 @@ public func streamAggStat(path: String, keyCol: String, valCol: String, how: Str
                         hdrCells.add(stripBom(String.fromUtf8(field.toArray())).trimAscii())
                     } else if (col == keyIdx) {
                         keyVal = String.fromUtf8(field.toArray())
+                        if (keyIdx == valIdx) {
+                            valVal = keyVal
+                        }
                     } else if (col == valIdx) {
                         valVal = String.fromUtf8(field.toArray())
                     }
@@ -125,8 +145,8 @@ public func streamAggStat(path: String, keyCol: String, valCol: String, how: Str
                                 throw IllegalArgumentException("column not found: ${valCol}")
                             }
                             headerReady = true
-                            hdrCells.clear()
                         }
+                        hdrCells.clear()
                     } else if (!blank) {
                         rows = rows + 1
                         accumulate(keys, index, sums, cnts, mins, maxs, keyVal, valVal)
@@ -160,6 +180,9 @@ public func streamAggStat(path: String, keyCol: String, valCol: String, how: Str
             hdrCells.add(stripBom(String.fromUtf8(field.toArray())).trimAscii())
         } else if (col == keyIdx) {
             keyVal = String.fromUtf8(field.toArray())
+            if (keyIdx == valIdx) {
+                valVal = keyVal
+            }
         } else if (col == valIdx) {
             valVal = String.fromUtf8(field.toArray())
         }
